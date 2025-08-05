@@ -1,0 +1,32 @@
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import api from "./Services/WebServices";
+import "./Services/ValidationRules";
+import sharedService from "./Services/ShareServices";
+import helperService from "./Services/HelperServices";
+import storeService from "./Services/StoreServices";
+import Notifications from "@kyvg/vue3-notification";
+import ToastPlugin from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-bootstrap.css";
+import VueNumeric from "@handcrafted-market/vue3-numeric";
+import "@fortawesome/fontawesome-free/css/all.css";
+import "bootstrap";
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import mitt from "mitt";
+import jQuery from "jquery";
+window.$ = window.jQuery = jQuery;
+
+const emitter = mitt();
+const app = createApp(App);
+app.config.globalProperties.emitter = emitter;
+app.config.globalProperties.$helperService = helperService;
+app.config.globalProperties.$storeService = storeService;
+app.config.globalProperties.$api = api;
+app.config.globalProperties.$sharedService = sharedService;
+app.use(ToastPlugin);
+app.use(router);
+app.use(Notifications);
+app.component("vue-numeric", VueNumeric);
+
+app.mount("#app");
