@@ -235,7 +235,10 @@
 
         <!-- Footer (Sticky Button) -->
         <div class="modal-footer justify-content-center border-top">
-          <button class="btn btn-success w-100" @click="openConfirmationBookModal(roomInfo)">
+          <button
+            class="btn btn-success w-100"
+            @click="openConfirmationBookModal(roomInfo)"
+          >
             Pay Now {{ $helperService.getFormattedCurrency(roomInfo?.total) }}
           </button>
         </div>
@@ -243,56 +246,56 @@
     </div>
   </div>
 
- <div
-  class="modal fade wb-modal-wrapper"
-  id="confirmationBook"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="confirmationBook"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered modal-md" role="document">
-    <div class="modal-content p-3">
-      <div class="text-end">
-        <a
-          class="text-danger fs-4 text-right"
-          @click="closeConfirmationModal()"
-          aria-label="Close"
-        >
-          <i class="fa fa-times-circle" aria-hidden="true"></i>
-        </a>
-      </div>
+  <div
+    class="modal fade wb-modal-wrapper"
+    id="confirmationBook"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="confirmationBook"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+      <div class="modal-content p-3">
+        <div class="text-end">
+          <a
+            class="text-danger fs-4 text-right"
+            @click="closeConfirmationModal()"
+            aria-label="Close"
+          >
+            <i class="fa fa-times-circle" aria-hidden="true"></i>
+          </a>
+        </div>
 
-      <div class="modal-header justify-content-center border-0 pb-2">
-        <h5 class="modal-title font-22 fw-bold text-center text-dark">
-          Are you sure you want to confirm this booking?
-        </h5>
-      </div>
+        <div class="modal-header justify-content-center border-0 pb-2">
+          <h5 class="modal-title font-22 fw-bold text-center text-dark">
+            Are you sure you want to confirm this booking?
+          </h5>
+        </div>
 
-      <div class="modal-body text-center">
-        <p class="text-muted">This action cannot be undone.</p>
-      </div>
+        <div class="modal-body text-center">
+          <p class="text-muted">This action cannot be undone.</p>
+        </div>
 
-      <div class="modal-footer justify-content-center border-0 pt-0">
-        <button
-          type="button"
-          class="btn btn-outline-secondary px-4 py-2 rounded-pill me-3"
-          @click="closeConfirmationModal"
-        >
-          Cancel
-        </button>
-        <button
-        id="confirm-booking"
-          type="button"
-          class="btn btn-success px-4 py-2 rounded-pill"
-        >
-          <i class="bi bi-check-circle me-2"></i>Confirm
-        </button>
+        <div class="modal-footer justify-content-center border-0 pt-0">
+          <button
+            type="button"
+            class="btn btn-outline-secondary px-4 py-2 rounded-pill me-3"
+            @click="closeConfirmationModal"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirm_booking_btn"
+            type="button"
+            class="btn btn-success px-4 py-2 rounded-pill"
+            @click="confirmBooking"
+          >
+            <i class="bi bi-check-circle me-2"></i>Confirm
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
 </template>
 
 <script>
@@ -328,6 +331,7 @@ export default {
       },
       no_of_night: "",
       roomInfo: {},
+      room_id: "",
     };
   },
   computed: {
@@ -351,7 +355,6 @@ export default {
   methods: {
     openBookNow(originalItem) {
       if (!originalItem) return;
-
       const item = { ...originalItem };
 
       const noOfNights = this.no_of_night || 1;
@@ -382,6 +385,7 @@ export default {
       item.total = totalAmount;
       console.log("totalAmount:", totalAmount);
       this.roomInfo = item;
+      this.room_id = item?.id;
       window.$("#bookNow").modal("show");
     },
     payNow() {
@@ -417,6 +421,35 @@ export default {
         })
         .then((res) => {
           this.hotel = res.info;
+        })
+        .catch((e) => {
+          this.$toast.error(e.message, {
+            postion: "top-right",
+          });
+        });
+    },
+    confirmBooking() {
+      let obj = {
+        hotel_id: this.hotel?.id,
+        room_id: this.room_id,
+        from_date: this.searchInfo?.from_date,
+        to_date: this.searchInfo?.to_date,
+        no_of_night: this.no_of_night,
+      };
+
+      console.log("current object is :", obj);
+      this.$api
+        .webRequest({
+          _method: "POST",
+          _action: "generate-transaction",
+          _buttonId:"confirm_booking_btn",
+          _body: obj,
+        })
+        .then((res) => {
+          this.closeConfirmationModal();
+       this.$toast.success(res?.message, {
+            postion: "top-right",
+          });
         })
         .catch((e) => {
           this.$toast.error(e.message, {

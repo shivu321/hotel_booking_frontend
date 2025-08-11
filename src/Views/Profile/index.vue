@@ -61,7 +61,7 @@
         <div class="modal-dialog modal-dialog-centered modal-md" role="document">
           <div class="modal-content">
             <a class="close mr-3 mt-3 text-right" @click="closeModal()" aria-label="Close">
-              <img src="/static/img/close-icon.svg" width="20" />
+              <i class="fa fa-times-circle" aria-hidden="true"></i>  
             </a>
             <div class="modal-header justify-content-center">
               <h5 class="modal-title font-22">

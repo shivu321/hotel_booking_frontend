@@ -138,6 +138,9 @@
                 {{ booking?.status }}
               </span>
             </p>
+            <p v-if="booking?.narration != null">
+              <strong>Reasons:</strong> <code>{{ booking?.narration }}</code>
+            </p>
             <p>
               <strong>Payment Mode:</strong>
               <span class="text-capitalize"><span class="text-muted mx-3">  Online / UPI </span></span>
